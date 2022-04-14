@@ -19,13 +19,15 @@ app.use(cors());
 // Initialize the main project folder
 app.use(express.static("website"));
 
-app.post("/add", async function (req, res) {
+// post route
+app.post("/post", async function (req, res) {
   const body = await req.body;
   projectData = body;
   res.status(200).send(projectData);
 });
 
-app.get("/all", async (req, res) => {
+//get route
+app.get("/get", async (req, res) => {
   res.send(projectData);
 });
 

@@ -1,33 +1,17 @@
 /* Global Variables */
+//read from elements
 const generate = document.getElementById("generate");
 const zip = document.getElementById("zip");
-const temp = document.getElementById("temp");
 const feelings = document.getElementById("feelings");
+
+//write to elements
 const date = document.getElementById("date");
+const temp = document.getElementById("temp");
+const content = document.getElementById("content");
 
 // Create a new date instance dynamically with JS
 let d = new Date();
 let newDate = d.toDateString();
-
-const apiCall =
-  "https://api.openweathermap.org/data/2.5/weather?zip={zip code},{country code}&appid={API key}";
-const apiURI = "https://api.openweathermap.org/data/2.5/weather?zip=";
-const myKey = "&appid=7f36636732065ef63d4dac7063be64e8&units=imperial";
-const country = "us";
-
-generate.addEventListener("click", (e) => {
-  e.preventDefault();
-  const exURI = `${apiURI}${zip.value}${myKey}`;
-  getData(exURI).then((data) => {
-    cureData(data).then((info) => {
-      postData("/add", info).then((data) => {
-        retreiveData("/all").then((data) => {
-          UI(data);
-        });
-      });
-    });
-  });
-});
 
 const getData = async (url) => {
   try {
@@ -41,23 +25,6 @@ const getData = async (url) => {
     }
   } catch (e) {
     console.log(e);
-  }
-};
-
-const cureData = async (data) => {
-  try {
-    if (data.message) {
-      return data;
-    } else {
-      const info = {
-        date: newDate,
-        feelings: feelings.value,
-        temp: data.main.temp,
-      };
-      return info;
-    }
-  } catch (e) {
-    console.error(e);
   }
 };
 
@@ -78,7 +45,7 @@ const postData = async (url = "", data = {}) => {
   }
 };
 
-const retreiveData = async (url) => {
+const jsonData = async (url) => {
   const data = await fetch(url);
   try {
     const response = await data.json();
@@ -90,5 +57,19 @@ const retreiveData = async (url) => {
 
 const UI = async (data) => {
   const response = await data;
-  console.log(response);
+  date.innerHTML = newDate;
+  temp.innerHTML = data.main.temp;
+  content.innerHTML = feelings.value;
 };
+
+generate.addEventListener("click", (e) => {
+  e.preventDefault();
+  const exURI = `https://api.openweathermap.org/data/2.5/weather?zip=${zip.value}&appid=7f36636732065ef63d4dac7063be64e8&units=imperial`;
+  getData(exURI).then((data) => {
+    postData("/post", data).then((data) => {
+      jsonData("/get").then((data) => {
+        UI(data);
+      });
+    });
+  });
+});
